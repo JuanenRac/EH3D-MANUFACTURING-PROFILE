@@ -3,6 +3,7 @@
 All notable changes to this project are documented here.
 
 ## [Unreleased]
+- **Shared checks updated:** the validator also compares the badge and the Version row of the README with the manifest, fails when one of its checks cannot run, and the CHANGELOG step of the workflow reads the base branch from the environment.
 
 - Add the library: profiles of a machine or a supplier with a tool table and limits named `min_<quantity>` or `max_<quantity>` where the quantity ends in its unit; the format refuses a field it does not know.
 - Find and report, with stable codes `PHOENIX-MPRO-001` to `PHOENIX-MPRO-006`: numbers without a unit, bad limits, conflicting tool definitions and restrictions without a source.
