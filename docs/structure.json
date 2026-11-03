@@ -144,6 +144,32 @@
         },
         {
           "desc": {
+            "en": "the library and the command line",
+            "es": "la biblioteca y la línea de comandos",
+            "de": "die Bibliothek und die Befehlszeile",
+            "fr": "la bibliothèque et la ligne de commande",
+            "it": "la libreria e la riga di comando",
+            "ja": "ライブラリとコマンドライン",
+            "zh": "库和命令行",
+            "pt": "a biblioteca e a linha de comandos"
+          },
+          "name": "src/"
+        },
+        {
+          "desc": {
+            "en": "Rust package and policy of the dependencies",
+            "es": "paquete de Rust y política de dependencias",
+            "de": "Rust-Paket und Richtlinie der Abhängigkeiten",
+            "fr": "paquet Rust et politique des dépendances",
+            "it": "pacchetto Rust e politica delle dipendenze",
+            "ja": "Rust パッケージと依存関係の方針",
+            "zh": "Rust 包与依赖策略",
+            "pt": "pacote Rust e política das dependências"
+          },
+          "name": "Cargo.toml  deny.toml"
+        },
+        {
+          "desc": {
             "en": "the repository check, its tests and the picture tools",
             "es": "la comprobación del repositorio, sus pruebas y las herramientas de las imágenes",
             "fr": "le contrôle du dépôt, ses tests et les outils des images",

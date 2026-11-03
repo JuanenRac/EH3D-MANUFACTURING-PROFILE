@@ -6,18 +6,18 @@
   "role": "library",
   "stack": "rust",
   "technologies": [
-    "Rust (planned)",
+    "Rust",
     "Markdown",
     "Python 3.10+"
   ],
   "deployment_target": "user-pc",
   "maturity": "scaffolding",
-  "evidence": "none",
+  "evidence": "host-test",
   "hardware_bound": false,
   "family": "PHOENIX",
   "parent": null,
-  "build": "python -I tools/ci_validate.py",
-  "notes": "Scaffolding v0.0.1: PLANNED, no code yet. Manager of manufacturing profiles: capabilities of workshop and factory machinery and the restrictions of suppliers. What exists is the base of every repository of the suite and the written scope, requirements, dependencies, threat model and decisions in docs/. The planned stack is Rust (a library with a command-line interface); nothing has been run on a machine.",
+  "build": "cargo build --release; cargo test",
+  "notes": "Scaffolding v0.0.1: early code. Profiles of the capabilities of workshop and factory machinery and of the restrictions of suppliers: a Rust library and command line that read a JSON profile whose limits always carry their unit (min_/max_ plus a quantity that ends in a unit), find numbers without a unit, bad limits, conflicting tool definitions and restrictions without a source, cite a profile by the SHA-256 of its content, and compare the measurements of a design with the limits, naming the limit, its source and the remedy. It has only run on data made by its own tests; the reading of the machine files that the server and the tool manager use, and the link with the verifier, are not written.",
   "native_version": {
     "file": "VERSION",
     "pattern": "^(\\d+\\.\\d+\\.\\d+)"

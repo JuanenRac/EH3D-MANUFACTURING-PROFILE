@@ -1,0 +1,28 @@
+[package]
+name = "eh3d-manufacturing-profile"
+version = "0.0.1"
+edition = "2021"
+rust-version = "1.88"
+description = "Profiles of the capabilities of workshop and factory machinery and of the restrictions of suppliers, with limits that always carry their unit"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/JuanenRac/EH3D-MANUFACTURING-PROFILE"
+readme = "README.md"
+
+[lib]
+name = "eh3d_manufacturing_profile"
+path = "src/lib.rs"
+
+[[bin]]
+name = "eh3d-manufacturing-profile"
+path = "src/main.rs"
+
+[dependencies]
+# sha2: the SHA-256 that cites a profile by its content
+sha2 = "0.10"
+# serde / serde_json: profiles are plain JSON
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"

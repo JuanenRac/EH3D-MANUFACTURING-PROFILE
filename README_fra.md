@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | 🇫🇷 <b>Français</b> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D-MANUFACTURING-PROFILE : prévu comme un gestionnaire de profils des capacités des machines d'usine et des contraintes des fournisseurs. Pas encore de code.
+### EH3D-MANUFACTURING-PROFILE : profils des capacités des machines d'atelier et d'usine et des restrictions des fournisseurs. Code initial.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Vérification d'honnêteté - ce qui tourne aujourd'hui :** rien. EH3D-MANUFACTURING-PROFILE est seulement prévu : il n'a pas de code, pas de tests propres et n'a jamais été exécuté. Ce qui existe, c'est la base de tout dépôt de la suite, plus le périmètre, les exigences, les dépendances, le modèle de menaces et les décisions écrits dans `docs/`.
+**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une bibliothèque Rust et une ligne de commande qui lisent un profil JSON dont les limites portent toujours leur unité, trouvent ce qui ne va pas (nombres sans unité, limites incorrectes, outils définis en conflit, restrictions sans source), le citent par le SHA-256 de son contenu et comparent les mesures d'une conception à ses limites en nommant la limite, la source et le remède. Tout n'a tourné que sur des données faites par ses propres tests. N'existent pas : la lecture des fichiers de machine qu'utilisent le serveur et le gestionnaire d'outils, et le lien avec le vérificateur.
 
 ---
 
@@ -46,14 +46,14 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 3 tests de la base tournent dans la CI et réussissent. |
-| Tests | 🟠 | Seule la base a des tests (3) ; le code du dépôt aura les siens au fur et à mesure qu'il sera écrit. |
+| Tests | 🟡 | Les 14 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
 | Matériel réel | 🟠 | Non exécuté sur une machine ni une carte : rien ici n'a été essayé sur du matériel. |
-| Fonction prévue | 🔴 | Pas commencée : rien de la fonction prévue n'est écrit. |
-| Exigences | 🔴 | Toutes les exigences sont seulement prévues : aucune n'est implémentée ni vérifiée. |
+| Fonction prévue | 🟠 | Écrit : le profil avec des unités dans chaque nom, la table d'outils, les restrictions de fournisseur avec leur source, le hash qui cite un profil et l'explication d'une violation. Non écrit : la correspondance avec les fichiers de machine du serveur et du gestionnaire d'outils. |
+| Exigences | 🟠 | 5 des 6 exigences sont au stade de prototype ; la correspondance avec les fichiers de machine (MPRO-002) est seulement prévue. Aucune n'est validée. |
 
 ## 🎯 Présentation
 
-* **Prévu :** EH3D-MANUFACTURING-PROFILE doit être un gestionnaire de profils des capacités des machines d'usine et des contraintes des fournisseurs. Il est prévu comme une bibliothèque sans fenêtre, avec une interface en ligne de commande et, le cas échéant, un type de tâche du serveur. Rien de cela n'existe encore.
+* **Ce qui existe :** une bibliothèque et une ligne de commande, sans fenêtre, qui lisent un profil JSON, le contrôlent (`check`), affichent son hash (`hash`) et comparent avec lui les mesures d'une conception (`verify`). **Prévu :** la lecture des fichiers de machine du serveur et du gestionnaire d'outils, le lien avec le vérificateur et un type de tâche du serveur.
 
 ## 🧩 Rôle dans EH3D
 
@@ -105,6 +105,8 @@ EH3D-MANUFACTURING-PROFILE/
 │   ├── NOT_YET.md RULES.md                      idées pour plus tard et règles d'écriture du code
 │   └── adr/                                     les décisions acceptées
 ├── AGENTS.md                                    règles pour quiconque modifie le dépôt
+├── src/                                         la bibliothèque et la ligne de commande
+├── Cargo.toml  deny.toml                        paquet Rust et politique des dépendances
 ├── tools/                                       le contrôle du dépôt, ses tests et les outils des images
 ├── images/                                      bannière et images d'Architecture et de Structure du dépôt
 ├── .github/                                     workflows de CI et du tableau de bord, modèles d'issues et de pull requests
@@ -121,7 +123,7 @@ EH3D-MANUFACTURING-PROFILE/
 
 **Limites connues aujourd'hui**
 
-* Seulement prévu : il n'y a pas de code, rien n'a été exécuté et aucune exigence n'est implémentée.
+* Code initial : n'a tourné que sur des données de ses propres tests ; les fichiers de machine du serveur et du gestionnaire d'outils ne sont pas encore lus.
 
 **Ensuite**
 

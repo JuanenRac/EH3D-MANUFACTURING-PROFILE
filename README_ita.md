@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | 🇮🇹 <b>Italiano</b> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D-MANUFACTURING-PROFILE: pianificato come un gestore di profili delle capacità dei macchinari di fabbrica e dei vincoli dei fornitori. Ancora senza codice.
+### EH3D-MANUFACTURING-PROFILE: profili delle capacità dei macchinari d'officina e di fabbrica e delle restrizioni dei fornitori. Codice iniziale.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
@@ -19,7 +19,7 @@
 
 ---
 
-**Verifica di onestà - cosa funziona oggi:** niente. EH3D-MANUFACTURING-PROFILE è solo pianificato: non ha codice, né test propri, e non è mai stato eseguito. Esistono la base che ogni repository della suite porta con sé, più l'ambito, i requisiti, le dipendenze, il modello delle minacce e le decisioni scritti in `docs/`.
+**Verifica di onestà - cosa funziona oggi:** una libreria Rust e una riga di comando che leggono un profilo JSON i cui limiti portano sempre la loro unità, trovano ciò che non va (numeri senza unità, limiti errati, utensili definiti in conflitto, restrizioni senza fonte), lo citano con lo SHA-256 del suo contenuto e confrontano le misure di un progetto con i suoi limiti, indicando il limite, la fonte e il rimedio. Tutto è stato eseguito solo su dati prodotti dai propri test. Non esistono: la lettura dei file macchina usati dal server e dal gestore utensili e il collegamento con il verificatore.
 
 ---
 
@@ -46,14 +46,14 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Controlli del repository | 🟡 | Il controllo del repository, quello delle immagini e i 3 test della base girano nella CI e passano. |
-| Test | 🟠 | Solo la base ha test (3); il codice del repository avrà i propri man mano che viene scritto. |
+| Test | 🟡 | I 14 test del codice Rust e i 3 della base passano su un computer. Usano solo dati prodotti dai test stessi. |
 | Hardware reale | 🟠 | Non eseguito su nessuna macchina né scheda: nulla qui è stato provato su hardware. |
-| Funzione pianificata | 🔴 | Non iniziata: nulla della funzione pianificata è stato scritto. |
-| Requisiti | 🔴 | Tutti i requisiti sono solo pianificati: nessuno è implementato o verificato. |
+| Funzione pianificata | 🟠 | Scritto: il profilo con unità in ogni nome, la tabella utensili, le restrizioni del fornitore con la loro fonte, l'hash che cita un profilo e la spiegazione di una violazione. Non scritto: la corrispondenza con i file macchina del server e del gestore utensili. |
+| Requisiti | 🟠 | 5 dei 6 requisiti sono a livello di prototipo; la corrispondenza con i file macchina (MPRO-002) è solo pianificata. Nessuno è validato. |
 
 ## 🎯 Panoramica
 
-* **Pianificato:** EH3D-MANUFACTURING-PROFILE vuole essere un gestore di profili delle capacità dei macchinari di fabbrica e dei vincoli dei fornitori. È pensato come una libreria senza finestra, con interfaccia a riga di comando e, quando serve, un tipo di attività del server. Nulla di tutto questo esiste ancora.
+* **Cosa esiste:** una libreria e una riga di comando, senza finestra, che leggono un profilo JSON, lo controllano (`check`), ne mostrano l'hash (`hash`) e confrontano con esso le misure di un progetto (`verify`). **Pianificato:** la lettura dei file macchina del server e del gestore utensili, il collegamento con il verificatore e un tipo di attività del server.
 
 ## 🧩 Ruolo in EH3D
 
@@ -105,6 +105,8 @@ EH3D-MANUFACTURING-PROFILE/
 │   ├── NOT_YET.md RULES.md                      idee per dopo e regole per scrivere il codice
 │   └── adr/                                     i registri delle decisioni accettate
 ├── AGENTS.md                                    regole per chi modifica il repository
+├── src/                                         la libreria e la riga di comando
+├── Cargo.toml  deny.toml                        pacchetto Rust e politica delle dipendenze
 ├── tools/                                       il controllo del repository, i suoi test e gli strumenti delle immagini
 ├── images/                                      banner e le immagini di Architettura e Struttura del repository
 ├── .github/                                     workflow di CI e della dashboard, modelli di issue e pull request
@@ -121,7 +123,7 @@ EH3D-MANUFACTURING-PROFILE/
 
 **Limiti noti oggi**
 
-* Solo pianificato: non c'è codice, non è stato eseguito nulla e nessun requisito è implementato.
+* Codice iniziale: eseguito solo su dati dei propri test; i file macchina del server e del gestore utensili non vengono ancora letti.
 
 **Prossimi passi**
 
