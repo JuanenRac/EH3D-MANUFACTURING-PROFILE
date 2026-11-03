@@ -106,7 +106,7 @@ EH3D-MANUFACTURING-PROFILE/
 │   └── adr/                                     承認された決定の記録
 ├── AGENTS.md                                    リポジトリを変更する人のための規則
 ├── src/                                         ライブラリとコマンドライン
-├── Cargo.toml  deny.toml                        Rust パッケージと依存関係の方針
+├── Cargo.toml Cargo.lock deny.toml              Rust パッケージと依存関係の方針
 ├── tools/                                       リポジトリ チェック、そのテスト、画像のツール
 ├── images/                                      バナーとアーキテクチャ・リポジトリ構成の図
 ├── .github/                                     CI とダッシュボードのワークフロー、Issue と PR のテンプレート

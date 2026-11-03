@@ -106,7 +106,7 @@ EH3D-MANUFACTURING-PROFILE/
 │   └── adr/                                     os registos das decisões aceites
 ├── AGENTS.md                                    regras para quem altera o repositório
 ├── src/                                         a biblioteca e a linha de comandos
-├── Cargo.toml  deny.toml                        pacote Rust e política das dependências
+├── Cargo.toml Cargo.lock deny.toml              pacote Rust e política das dependências
 ├── tools/                                       a verificação do repositório, os seus testes e as ferramentas das imagens
 ├── images/                                      banner e as imagens de Arquitetura e Estrutura do repositório
 ├── .github/                                     fluxos de CI e do painel, modelos de issues e pull requests

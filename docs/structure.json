@@ -166,7 +166,8 @@
             "zh": "Rust 包与依赖策略",
             "pt": "pacote Rust e política das dependências"
           },
-          "name": "Cargo.toml  deny.toml"
+          "name": "Cargo.toml  Cargo.lock  deny.toml",
+          "tree_name": "Cargo.toml Cargo.lock deny.toml"
         },
         {
           "desc": {
