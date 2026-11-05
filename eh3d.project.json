@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "ecosystem": "EH3D",
   "name": "EH3D-MANUFACTURING-PROFILE",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "role": "library",
   "stack": "rust",
   "technologies": [
@@ -17,7 +17,7 @@
   "family": "PHOENIX",
   "parent": null,
   "build": "cargo build --release; cargo test",
-  "notes": "Scaffolding v0.0.1: early code. Profiles of the capabilities of workshop and factory machinery and of the restrictions of suppliers: a Rust library and command line that read a JSON profile whose limits always carry their unit (min_/max_ plus a quantity that ends in a unit), find numbers without a unit, bad limits, conflicting tool definitions and restrictions without a source, cite a profile by the SHA-256 of its content, and compare the measurements of a design with the limits, naming the limit, its source and the remedy. It has only run on data made by its own tests; the reading of the machine files that the server and the tool manager use, and the link with the verifier, are not written.",
+  "notes": "Scaffolding v0.0.2: early code. Profiles of the capabilities of workshop and factory machinery and of the restrictions of suppliers: a Rust library and command line that read a JSON profile whose limits always carry their unit (min_/max_ plus a quantity that ends in a unit), find numbers without a unit, bad limits, conflicting tool definitions and restrictions without a source, cite a profile by the SHA-256 of its content, and compare the measurements of a design with the limits, naming the limit, its source and the remedy. It has only run on data made by its own tests; the reading of the machine files that the server and the tool manager use, and the link with the verifier, are not written.",
   "native_version": {
     "file": "VERSION",
     "pattern": "^(\\d+\\.\\d+\\.\\d+)"

@@ -1,6 +1,6 @@
 [package]
 name = "eh3d-manufacturing-profile"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 rust-version = "1.88"
 description = "Profiles of the capabilities of workshop and factory machinery and of the restrictions of suppliers, with limits that always carry their unit"
