@@ -107,6 +107,7 @@ EH3D-MANUFACTURING-PROFILE/
 ├── AGENTS.md                                    リポジトリを変更する人のための規則
 ├── src/                                         ライブラリとコマンドライン
 ├── Cargo.toml Cargo.lock deny.toml              Rust パッケージと依存関係の方針
+├── rust-toolchain.toml                          固定されたRustツールチェーン
 ├── tools/                                       リポジトリ チェック、そのテスト、画像のツール
 ├── images/                                      バナーとアーキテクチャ・リポジトリ構成の図
 ├── .github/                                     CI とダッシュボードのワークフロー、Issue と PR のテンプレート

@@ -107,6 +107,7 @@ EH3D-MANUFACTURING-PROFILE/
 ├── AGENTS.md                                    règles pour quiconque modifie le dépôt
 ├── src/                                         la bibliothèque et la ligne de commande
 ├── Cargo.toml Cargo.lock deny.toml              paquet Rust et politique des dépendances
+├── rust-toolchain.toml                          la toolchain Rust épinglée
 ├── tools/                                       le contrôle du dépôt, ses tests et les outils des images
 ├── images/                                      bannière et images d'Architecture et de Structure du dépôt
 ├── .github/                                     workflows de CI et du tableau de bord, modèles d'issues et de pull requests
