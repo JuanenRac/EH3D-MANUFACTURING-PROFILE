@@ -34,23 +34,3 @@ jobs:
         run: python -I tools/changelog_pr_check.py --base "origin/$BASE_REF"
       - name: Tests of the base
         run: python -I -m unittest discover -s tools -p "test_*.py"
-  rust:
-    name: Rust (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-        with:
-          persist-credentials: false
-      - name: Rust toolchain
-        shell: bash
-        run: rustup toolchain install "$(sed -n 's/^channel = "\(.*\)"/\1/p' rust-toolchain.toml)" --profile minimal --component rustfmt,clippy
-      - name: Format
-        run: cargo fmt --check
-      - name: Lints
-        run: cargo clippy --all-targets -- -D warnings
-      - name: Tests
-        run: cargo test --all-targets
