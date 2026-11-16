@@ -17,7 +17,8 @@ eh3d-manufacturing-profile [--config FILE] <command>
   check <profile.json>                     list what is wrong: numbers without a unit, bad limits, conflicting tools, restrictions without a source
   hash <profile.json>                      print the SHA-256 that cites the content of the profile
   verify <profile.json> <measurements.json>
-                                           compare the measurements of a design (a JSON object of quantity to number) with the limits
+                                           compare the measurements of a design (a JSON object of quantity to number) with the limits;
+                                           the profile is checked first and nothing is compared while it has findings
 
 Exit codes: 0 nothing found, 1 findings or violations, 2 unusable input.
 ";
@@ -48,6 +49,17 @@ pub fn run(args: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
     }
 }
 
+fn print_findings(out: &mut dyn Write, findings: &[crate::profile::Finding]) {
+    for f in findings {
+        let subject = if f.subject.is_empty() {
+            String::new()
+        } else {
+            format!(" [{}]", f.subject)
+        };
+        let _ = writeln!(out, "{}{}: {}", f.code.as_str(), subject, f.message);
+    }
+}
+
 fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<MproError>> {
     let mut args = args.to_vec();
     let mut config = Config::default();
@@ -68,14 +80,7 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<MproErro
         ["check", _] => {
             let profile = load(&args[1])?;
             let findings = profile.check(&config);
-            for f in &findings {
-                let subject = if f.subject.is_empty() {
-                    String::new()
-                } else {
-                    format!(" [{}]", f.subject)
-                };
-                let _ = writeln!(out, "{}{}: {}", f.code.as_str(), subject, f.message);
-            }
+            print_findings(out, &findings);
             let _ = writeln!(out, "# {} findings", findings.len());
             Ok(if findings.is_empty() { 0 } else { 1 })
         }
@@ -86,6 +91,18 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<MproErro
         }
         ["verify", _, _] => {
             let profile = load(&args[1])?;
+            if config.check_before_verify {
+                let findings = profile.check(&config);
+                if !findings.is_empty() {
+                    print_findings(out, &findings);
+                    let _ = writeln!(
+                        out,
+                        "# {} findings in the profile: nothing was compared",
+                        findings.len()
+                    );
+                    return Ok(1);
+                }
+            }
             let text = read_text(Path::new(&args[2]), config.max_file_bytes).map_err(Some)?;
             let measurements: BTreeMap<String, f64> =
                 serde_json::from_str(&text).map_err(|e| Some(MproError::BadJson(e.to_string())))?;
@@ -219,6 +236,32 @@ mod tests {
             empty.to_str().unwrap(),
         ]);
         assert_eq!(code, 1);
+    }
+
+    #[test]
+    fn verify_compares_nothing_while_the_profile_has_findings() {
+        let work = tempfile::tempdir().unwrap();
+        let bad = work.path().join("bad.json");
+        let low = work.path().join("low.json");
+        let cfg = work.path().join("c.cfg");
+        fs::write(&bad, BAD).unwrap();
+        fs::write(&low, r#"{"track_mm":0.1}"#).unwrap();
+        fs::write(&cfg, "check_before_verify = off\n").unwrap();
+        let (code, text, _) = call(&["verify", bad.to_str().unwrap(), low.to_str().unwrap()]);
+        assert_eq!(code, 1);
+        assert!(
+            text.contains("PHOENIX-MPRO-001") && text.contains("nothing was compared"),
+            "{text}"
+        );
+        assert!(!text.contains("violations"), "{text}");
+        let (_, text, _) = call(&[
+            "--config",
+            cfg.to_str().unwrap(),
+            "verify",
+            bad.to_str().unwrap(),
+            low.to_str().unwrap(),
+        ]);
+        assert!(text.contains("violations"), "{text}");
     }
 
     #[test]
