@@ -204,12 +204,7 @@ mod tests {
         let cfg = work.path().join("c.cfg");
         fs::write(&good, GOOD).unwrap();
         fs::write(&empty, "{}").unwrap();
-        fs::write(
-            &cfg,
-            "require_all_limits_measured = on
-",
-        )
-        .unwrap();
+        fs::write(&cfg, "require_all_limits_measured = on\n").unwrap();
         let (code, text, _) = call(&["verify", good.to_str().unwrap(), empty.to_str().unwrap()]);
         assert_eq!(code, 0);
         assert!(
