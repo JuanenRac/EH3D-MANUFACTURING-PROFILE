@@ -18,6 +18,8 @@ pub struct Config {
     pub reject_unknown_measurements: bool,
     /// A limit that no measurement answers makes `verify` fail (exit 1) instead of only being listed as not evaluated.
     pub require_all_limits_measured: bool,
+    /// `verify` runs the checks of the profile first and does not compare anything while the profile has findings (a profile with a bad limit would give a verdict that means nothing).
+    pub check_before_verify: bool,
     /// A measurement outside a limit by no more than this percent of the limit still passes (0: the limit is exact).
     pub tolerance_percent: f64,
 }
@@ -34,6 +36,7 @@ impl Default for Config {
             require_source: true,
             reject_unknown_measurements: false,
             require_all_limits_measured: false,
+            check_before_verify: true,
             tolerance_percent: 0.0,
         }
     }
@@ -92,6 +95,9 @@ impl Config {
                 }
                 "require_all_limits_measured" => {
                     config.require_all_limits_measured = flag(value).ok_or_else(bad)?
+                }
+                "check_before_verify" => {
+                    config.check_before_verify = flag(value).ok_or_else(bad)?
                 }
                 "tolerance_percent" => {
                     let n: f64 = value.parse().map_err(|_| bad())?;
