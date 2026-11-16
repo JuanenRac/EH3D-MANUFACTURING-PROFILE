@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **`verify` says which limits it could not evaluate:** a limit that no measurement answers (an empty measurements file, a misspelt quantity) was skipped in silence and the run ended with `# 0 violations`. It now also prints how many limits were not evaluated and which, and the new setting `require_all_limits_measured` (off by default, as before) makes that a failure with exit code 1. Tested.
+
 ## [0.0.3] - Shared validation checks, split CI workflows and pinned Rust toolchain
 
 - **The shared validation tools are updated:** the validator also runs the workflow and lessons checks of the suite with their latest rules, including a check to run before every push.

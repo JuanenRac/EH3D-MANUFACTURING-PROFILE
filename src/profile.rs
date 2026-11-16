@@ -234,6 +234,17 @@ impl Profile {
         out
     }
 
+    /// The limits that no measurement answers, by name and sorted: `verify` cannot say anything about them.
+    pub fn unmeasured(&self, measurements: &BTreeMap<String, f64>) -> Vec<String> {
+        self.limits
+            .keys()
+            .filter(|name| {
+                split_limit(name).is_some_and(|(_, quantity)| !measurements.contains_key(quantity))
+            })
+            .cloned()
+            .collect()
+    }
+
     /// Compare the measurements of a design (`quantity` to value) with the limits. The violations come sorted by the name of the limit.
     pub fn verify(
         &self,
@@ -287,6 +298,20 @@ impl Profile {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_limits_that_no_measurement_answers_are_listed() {
+        let p = supplier();
+        let mut m = BTreeMap::new();
+        assert_eq!(p.unmeasured(&m), vec!["max_layers_count", "min_track_mm"]);
+        // a misspelt quantity answers nothing
+        m.insert("trackwidth_mm".to_string(), 0.05);
+        assert_eq!(p.unmeasured(&m).len(), 2);
+        m.insert("track_mm".to_string(), 0.2);
+        assert_eq!(p.unmeasured(&m), vec!["max_layers_count"]);
+        m.insert("layers_count".to_string(), 2.0);
+        assert!(p.unmeasured(&m).is_empty());
+    }
 
     fn limit(value: f64, source: &str, remedy: &str) -> Limit {
         Limit {
