@@ -16,6 +16,8 @@ pub struct Config {
     pub require_source: bool,
     /// A measurement that no limit mentions is reported as an error of the input rather than ignored.
     pub reject_unknown_measurements: bool,
+    /// A limit that no measurement answers makes `verify` fail (exit 1) instead of only being listed as not evaluated.
+    pub require_all_limits_measured: bool,
     /// A measurement outside a limit by no more than this percent of the limit still passes (0: the limit is exact).
     pub tolerance_percent: f64,
 }
@@ -31,6 +33,7 @@ impl Default for Config {
                 .collect(),
             require_source: true,
             reject_unknown_measurements: false,
+            require_all_limits_measured: false,
             tolerance_percent: 0.0,
         }
     }
@@ -86,6 +89,9 @@ impl Config {
                 "require_source" => config.require_source = flag(value).ok_or_else(bad)?,
                 "reject_unknown_measurements" => {
                     config.reject_unknown_measurements = flag(value).ok_or_else(bad)?
+                }
+                "require_all_limits_measured" => {
+                    config.require_all_limits_measured = flag(value).ok_or_else(bad)?
                 }
                 "tolerance_percent" => {
                     let n: f64 = value.parse().map_err(|_| bad())?;

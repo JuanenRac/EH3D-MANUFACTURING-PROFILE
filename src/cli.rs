@@ -99,7 +99,21 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<MproErro
                 );
             }
             let _ = writeln!(out, "# {} violations", violations.len());
-            Ok(if violations.is_empty() { 0 } else { 1 })
+            let unmeasured = profile.unmeasured(&measurements);
+            if !unmeasured.is_empty() {
+                let _ = writeln!(
+                    out,
+                    "# {} limits not evaluated, no measurement answers them: {}",
+                    unmeasured.len(),
+                    unmeasured.join(", ")
+                );
+            }
+            let missing = config.require_all_limits_measured && !unmeasured.is_empty();
+            Ok(if violations.is_empty() && !missing {
+                0
+            } else {
+                1
+            })
         }
         _ => Err(None),
     }
@@ -180,6 +194,31 @@ mod tests {
         assert_eq!(call(&["check"]).0, 2);
         assert_eq!(call(&["check", "no-such-file.json"]).0, 2);
         assert_eq!(call(&["--config", "x"]).0, 2);
+    }
+
+    #[test]
+    fn the_limits_without_a_measurement_are_said_and_can_make_verify_fail() {
+        let work = tempfile::tempdir().unwrap();
+        let good = work.path().join("good.json");
+        let empty = work.path().join("empty.json");
+        let cfg = work.path().join("c.cfg");
+        fs::write(&good, GOOD).unwrap();
+        fs::write(&empty, "{}").unwrap();
+        fs::write(&cfg, "require_all_limits_measured = on\n").unwrap();
+        let (code, text, _) = call(&["verify", good.to_str().unwrap(), empty.to_str().unwrap()]);
+        assert_eq!(code, 0);
+        assert!(
+            text.contains("# 0 violations") && text.contains("limits not evaluated"),
+            "{text}"
+        );
+        let (code, _, _) = call(&[
+            "--config",
+            cfg.to_str().unwrap(),
+            "verify",
+            good.to_str().unwrap(),
+            empty.to_str().unwrap(),
+        ]);
+        assert_eq!(code, 1);
     }
 
     #[test]
