@@ -460,7 +460,10 @@ mod tests {
             &Config::default(),
         )
         .unwrap();
-        assert_eq!(p.hash(), "TBD");
+        assert_eq!(
+            p.hash(),
+            "ee0a13e3b5700fde78d524d6531642f61e230592bf6ee500883b7d72cf7dee70"
+        );
     }
 
     #[test]
