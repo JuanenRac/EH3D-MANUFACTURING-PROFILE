@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The threat model says what the code already does:** the rows of `docs/THREAT_MODEL.md` that have a mitigation in the code and a test for it are marked `partial` and name the tests and what is still not covered; the rows without either stay `planned`.
+
 - **`verify` checks the profile first:** while the profile has findings it prints them, compares nothing and exits with 1, because a profile with a bad limit gives a verdict that means nothing. The setting `check_before_verify` (on by default) turns it off.
 - **`verify` says which limits it could not evaluate:** a limit that no measurement answers (an empty measurements file, a misspelt quantity) was skipped in silence and the run ended with `# 0 violations`. It now also prints how many limits were not evaluated and which, and the new setting `require_all_limits_measured` (off by default, as before) makes that a failure with exit code 1. Tested.
 
