@@ -1,12 +1,12 @@
 # EH3D-MANUFACTURING-PROFILE: threat model
 
-Basic model for a project that has no code yet. Every row is a plan, not a result: no mitigation exists and no test has been run. The rows are the threats to design against from the first line of code.
+Basic model for early code. The rows marked partial have a mitigation written and tests for it, run only on data made by the tests themselves; the rows marked planned have nothing yet. No row is assessed against real data.
 
 | Threat | Planned mitigation | Planned test | State | Residual risk |
 |---|---|---|---|---|
-| A tampered profile that widens a limit | profiles are hashed; changes are visible in history and passport | tamper tests | planned | not assessed: nothing is implemented |
+| A tampered profile that widens a limit | the hash of a profile changes with any change of its content, so a changed limit no longer matches the hash that was published | `the_same_content_has_the_same_hash_and_a_change_changes_it` | partial | the hash is not signed: a profile replaced together with its hash is not detected |
 | A profile read as authority over the machine | documented as an input; the machine keeps its own limits | review | planned | not assessed: nothing is implemented |
-| Corrupt or malicious project or input files (oversized entries, path tricks, deep nesting, resource exhaustion) | name rules, size and depth limits, bounded readers | fuzzing and hostile samples | planned | not assessed: nothing is implemented |
+| Corrupt or malicious project or input files (oversized entries, path tricks, deep nesting, resource exhaustion) | the reader refuses a number the format does not know and applies the size limits | `a_number_that_the_format_does_not_know_is_refused_when_reading`, `the_size_limits_apply` | partial | hostile samples written by hand; no fuzzing yet |
 | Temporary files, logs and reports that reveal private designs | no private data in outputs; redaction | automated pattern search | planned | not assessed: nothing is implemented |
 | Compromised dependency or binary | pinned versions, licence and advisory checks, software bill of materials for releases | CI checks | planned | not assessed: nothing is implemented |
 | Power loss or forced close during a save | atomic write: temporary file, then rename; old file never deleted first | interruption tests at controlled points | planned | not assessed: nothing is implemented |
