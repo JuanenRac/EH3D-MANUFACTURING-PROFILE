@@ -453,6 +453,17 @@ mod tests {
     }
 
     #[test]
+    fn the_hash_of_a_fixed_profile_is_the_known_one() {
+        // a fixed vector: a change of the order of the fields or of the way the content is written changes every hash that was ever quoted
+        let p = Profile::from_json(
+            r#"{"name":"m","kind":"machine","limits":{"max_a_mm":{"value":1},"min_b_mm":{"value":2}}}"#,
+            &Config::default(),
+        )
+        .unwrap();
+        assert_eq!(p.hash(), "TBD");
+    }
+
+    #[test]
     fn a_violation_names_the_limit_the_source_and_the_remedy() {
         let p = supplier();
         let mut m = BTreeMap::new();

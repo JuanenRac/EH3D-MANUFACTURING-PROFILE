@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A test fixes the known value of the hash of a fixed profile:** until now the tests compared two calculations of the same code, so an accidental change of the order of the fields or of the way the content is written would have changed every hash that was ever quoted without a test failing. The test writes the expected hash of a fixed case.
+
 - **The threat model says what the code already does:** the rows of `docs/THREAT_MODEL.md` that have a mitigation in the code and a test for it are marked `partial` and name the tests and what is still not covered; the rows without either stay `planned`.
 
 - **`verify` checks the profile first:** while the profile has findings it prints them, compares nothing and exits with 1, because a profile with a bad limit gives a verdict that means nothing. The setting `check_before_verify` (on by default) turns it off.
