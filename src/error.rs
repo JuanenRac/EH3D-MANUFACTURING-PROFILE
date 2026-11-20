@@ -31,6 +31,9 @@ pub enum MproError {
     /// The profile is not valid JSON of the expected shape.
     #[error("the profile cannot be read: {0}")]
     BadJson(String),
+    /// A measurement is not a finite number, so it cannot be compared with a limit.
+    #[error("the measurement `{0}` is not a finite number")]
+    NonFiniteMeasurement(String),
     /// A measurement names a quantity that no limit of the profile mentions, and the settings say that is an error.
     #[error("no limit of the profile mentions the measurement `{0}`")]
     UnknownMeasurement(String),

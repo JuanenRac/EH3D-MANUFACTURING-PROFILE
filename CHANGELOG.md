@@ -10,6 +10,9 @@ All notable changes to this project are documented here.
 
 - **`verify` checks the profile first:** while the profile has findings it prints them, compares nothing and exits with 1, because a profile with a bad limit gives a verdict that means nothing. The setting `check_before_verify` (on by default) turns it off.
 - **`verify` says which limits it could not evaluate:** a limit that no measurement answers (an empty measurements file, a misspelt quantity) was skipped in silence and the run ended with `# 0 violations`. It now also prints how many limits were not evaluated and which, and the new setting `require_all_limits_measured` (off by default, as before) makes that a failure with exit code 1. Tested.
+- **The check names a minimum above the maximum of the same quantity:** `min_track_mm` of 0.2 with `max_track_mm` of 0.1 is reported as a bad limit (`PHOENIX-MPRO-002`), because no measurement can meet both; equal bounds are accepted.
+- **`verify` refuses a measurement that is not a finite number:** a value that is not a number, or infinite, was below no minimum and above no maximum and so passed every limit; now it ends the run with an error that names the quantity (exit code 2).
+- **The settings refuse `max_file_bytes = 0` and a unit written twice:** a limit of zero bytes would refuse every file, and `units = mm, rpm, MM` repeats a unit (the names are compared in lower case).
 
 ## [0.0.3] - Shared validation checks, split CI workflows and pinned Rust toolchain
 

@@ -18,4 +18,4 @@ The official state of each capability is in REQUIREMENTS.md: 6 requirements: 5 `
 
 ## Known technical debt and omitted tests
 
-14 tests of the Rust code and the 3 of the base; the Rust tests build their own profiles and never touch real data. Not tested: very large profiles. `cargo deny` is not run yet.
+21 tests of the Rust code and the 3 of the base; the Rust tests build their own profiles and never touch real data. Not tested: very large profiles. `cargo deny` is not run yet.

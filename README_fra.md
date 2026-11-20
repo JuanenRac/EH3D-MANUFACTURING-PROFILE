@@ -46,7 +46,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 3 tests de la base tournent dans la CI et réussissent. |
-| Tests | 🟡 | Les 14 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
+| Tests | 🟡 | Les 21 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
 | Matériel réel | 🟠 | Non exécuté sur une machine ni une carte : rien ici n'a été essayé sur du matériel. |
 | Fonction prévue | 🟠 | Écrit : le profil avec des unités dans chaque nom, la table d'outils, les restrictions de fournisseur avec leur source, le hash qui cite un profil et l'explication d'une violation. Non écrit : la correspondance avec les fichiers de machine du serveur et du gestionnaire d'outils. |
 | Exigences | 🟠 | 5 des 6 exigences sont au stade de prototype ; la correspondance avec les fichiers de machine (MPRO-002) est seulement prévue. Aucune n'est validée. |

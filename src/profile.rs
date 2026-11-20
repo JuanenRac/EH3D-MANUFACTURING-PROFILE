@@ -230,6 +230,27 @@ impl Profile {
                 ));
             }
         }
+        // a minimum above the maximum of the same quantity: nothing can meet both
+        for (name, minimum) in &self.limits {
+            let Some(quantity) = name.strip_prefix("min_") else {
+                continue;
+            };
+            if let Some(maximum) = self.limits.get(&format!("max_{quantity}")) {
+                if minimum.value.is_finite()
+                    && maximum.value.is_finite()
+                    && minimum.value > maximum.value
+                {
+                    out.push(f(
+                        Code::BadLimit,
+                        name,
+                        format!(
+                            "the minimum {} is above the maximum {} of `{quantity}`: no value meets both",
+                            minimum.value, maximum.value
+                        ),
+                    ));
+                }
+            }
+        }
         out.sort_by(|a, b| (a.code, &a.subject).cmp(&(b.code, &b.subject)));
         out
     }
@@ -251,6 +272,10 @@ impl Profile {
         measurements: &BTreeMap<String, f64>,
         config: &Config,
     ) -> Result<Vec<Violation>, MproError> {
+        // a number that is not finite is below no minimum and above no maximum: it would pass every limit
+        if let Some((quantity, _)) = measurements.iter().find(|(_, v)| !v.is_finite()) {
+            return Err(MproError::NonFiniteMeasurement(quantity.clone()));
+        }
         if config.reject_unknown_measurements {
             for quantity in measurements.keys() {
                 let mentioned = self
@@ -298,6 +323,44 @@ impl Profile {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_minimum_above_the_maximum_of_the_same_quantity_is_a_bad_limit() {
+        let mut p = supplier();
+        p.limits
+            .insert("max_track_mm".to_string(), limit(0.10, "price list", ""));
+        let findings = p.check(&Config::default());
+        assert_eq!(findings.len(), 1, "{findings:?}");
+        assert_eq!(findings[0].code, Code::BadLimit);
+        assert_eq!(findings[0].subject, "min_track_mm");
+        assert!(findings[0].message.contains("no value meets both"));
+        // equal bounds are one exact value, which is possible
+        p.limits
+            .insert("max_track_mm".to_string(), limit(0.15, "price list", ""));
+        assert!(p.check(&Config::default()).is_empty());
+        // a bound that is not finite is reported once, by its own rule
+        p.limits.insert(
+            "max_track_mm".to_string(),
+            limit(f64::NAN, "price list", ""),
+        );
+        assert_eq!(p.check(&Config::default()).len(), 1);
+    }
+
+    #[test]
+    fn a_measurement_that_is_not_finite_is_refused_and_not_taken_as_passing() {
+        let p = supplier();
+        for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+            let mut m = BTreeMap::new();
+            m.insert("track_mm".to_string(), bad);
+            match p.verify(&m, &Config::default()) {
+                Err(MproError::NonFiniteMeasurement(q)) => assert_eq!(q, "track_mm"),
+                other => panic!("{bad}: {other:?}"),
+            }
+        }
+        let mut m = BTreeMap::new();
+        m.insert("track_mm".to_string(), 0.2);
+        assert!(p.verify(&m, &Config::default()).unwrap().is_empty());
+    }
 
     #[test]
     fn the_limits_that_no_measurement_answers_are_listed() {

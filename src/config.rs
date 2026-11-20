@@ -69,7 +69,13 @@ impl Config {
                 key: key.to_string(),
             };
             match key {
-                "max_file_bytes" => config.max_file_bytes = value.parse().map_err(|_| bad())?,
+                "max_file_bytes" => {
+                    let n: u64 = value.parse().map_err(|_| bad())?;
+                    if n == 0 {
+                        return Err(bad());
+                    }
+                    config.max_file_bytes = n;
+                }
                 "max_entries" => {
                     let n: usize = value.parse().map_err(|_| bad())?;
                     if n == 0 {
@@ -85,6 +91,11 @@ impl Config {
                     if list.iter().any(|u| {
                         u.is_empty() || !u.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
                     }) {
+                        return Err(bad());
+                    }
+                    // a unit written twice (`mm` and `MM` are the same) is a slip in the file
+                    let mut seen = std::collections::BTreeSet::new();
+                    if !list.iter().all(|u| seen.insert(u.as_str())) {
                         return Err(bad());
                     }
                     config.units = list;
@@ -121,6 +132,24 @@ impl Config {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_limit_of_zero_bytes_and_a_unit_written_twice_are_refused() {
+        assert!(matches!(
+            Config::parse("max_file_bytes = 0\n"),
+            Err(MproError::ConfigBadValue { line: 1, .. })
+        ));
+        assert_eq!(
+            Config::parse("max_file_bytes = 10\n")
+                .unwrap()
+                .max_file_bytes,
+            10
+        );
+        assert!(matches!(
+            Config::parse("units = mm, rpm, MM\n"),
+            Err(MproError::ConfigBadValue { line: 1, .. })
+        ));
+    }
 
     #[test]
     fn defaults_are_conservative() {
