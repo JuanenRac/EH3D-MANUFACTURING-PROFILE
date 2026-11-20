@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "eh3d-manufacturing-profile"
-version = "0.0.3"
+version = "0.0.4"
 dependencies = [
  "serde",
  "serde_json",
