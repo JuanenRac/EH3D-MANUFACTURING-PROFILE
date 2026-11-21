@@ -5,7 +5,7 @@ EH3D-MANUFACTURING-PROFILE: planned as a manager of profiles of the capabilities
 ## 1. Before you start
 
 1. Read `docs/STATUS.md`: what exists, what is missing, what the last change decided.
-2. Read `docs/REQUIREMENTS.md` (the register of requirements and the state of each) and `docs/DECISIONS.md`.
+2. Read `docs/SCOPE.md` (what the program is for and what it never decides), `docs/REQUIREMENTS.md` (the register of requirements, the state of each and the test that shows it) and `docs/DECISIONS.md`.
 3. Read the decision records in `docs/adr/` that touch what you change. Do not contradict an accepted record; write a new one instead.
 
 ## 2. Build and test
@@ -35,6 +35,7 @@ EH3D-MANUFACTURING-PROFILE: planned as a manager of profiles of the capabilities
 
 - Any claim about a third-party format cites its published specification, an example file or a comparison with a golden file. Formats and programming interfaces are not invented.
 - A state in `docs/REQUIREMENTS.md` is `validated` only with evidence; nothing is green that has never run on the real thing.
+- A requirement names a test that exists; when a requirement changes state, the row and `docs/STATUS.md` change in the same commit, and `tests/reqs.rs` says whether they agree.
 
 ## 6. Clean room
 

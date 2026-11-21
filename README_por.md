@@ -46,7 +46,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Verificações do repositório | 🟡 | A verificação do repositório, a das imagens e os 3 testes da base correm na CI e passam. |
-| Testes | 🟡 | Os 21 testes do código Rust e os 3 da base passam num computador. Usam apenas dados feitos pelos próprios testes. |
+| Testes | 🟡 | Os 30 testes do código Rust e os 3 da base passam num computador. Usam apenas dados feitos pelos próprios testes. |
 | Hardware real | 🟠 | Não foi executado em nenhuma máquina nem placa: nada aqui foi experimentado em hardware. |
 | Função planeada | 🟠 | Escrito: o perfil com unidades em cada nome, a tabela de ferramentas, as restrições do fornecedor com a sua fonte, o hash que cita um perfil e a explicação de uma violação. Por escrever: a correspondência com os ficheiros de máquina do servidor e do gestor de ferramentas. |
 | Requisitos | 🟠 | 5 dos 6 requisitos estão em protótipo; a correspondência com os ficheiros de máquina (MPRO-002) está apenas planeada. Nenhum está validado. |
@@ -99,13 +99,14 @@ A versão vive no ficheiro `VERSION` e em `eh3d.project.json`, e cada versão te
 EH3D-MANUFACTURING-PROFILE/
 ├── docs/
 │   ├── architecture.json structure.json         os dados das duas imagens
-│   ├── SCOPE.md REQUIREMENTS.md                 o que está planeado e os seus requisitos
+│   ├── SCOPE.md REQUIREMENTS.md                 o âmbito e o registo de requisitos com o teste de cada um
 │   ├── DEPENDENCIES.md THREAT_MODEL.md          relações com outros repositórios e modelo de ameaças
 │   ├── DECISIONS.md STATUS.md                   decisões que se aplicam aqui e estado honesto
 │   ├── NOT_YET.md RULES.md                      ideias para mais tarde e regras para escrever código
 │   └── adr/                                     os registos das decisões aceites
 ├── AGENTS.md                                    regras para quem altera o repositório
 ├── src/                                         a biblioteca e a linha de comandos
+├── tests/                                       o teste que mantém verdadeiro o registo de requisitos
 ├── Cargo.toml Cargo.lock deny.toml              pacote Rust e política das dependências
 ├── rust-toolchain.toml                          a toolchain de Rust fixada
 ├── tools/                                       a verificação do repositório, os seus testes e as ferramentas das imagens
@@ -143,7 +144,11 @@ O README e os textos existem em inglês, espanhol, francês, italiano, alemão, 
 
 * [As convenções da suite](https://github.com/JuanenRac/EH3D-DOCS/blob/main/docs/CONVENTIONS.md)
 * [Registo de alterações](CHANGELOG.md)
-* [Âmbito, requisitos, dependências, modelo de ameaças e decisões](docs/SCOPE.md)
+* [Âmbito](docs/SCOPE.md): para que serve o programa, o que não fará e o que nunca decide.
+* [Requisitos](docs/REQUIREMENTS.md): o registo das capacidades, o estado de cada uma e o teste que a mostra.
+* [Estado](docs/STATUS.md): o que existe, o que falta e o que continua em aberto.
+* [Ainda não](docs/NOT_YET.md): boas ideias que ficam fora desta versão.
+* [Regras para alterar o repositório](AGENTS.md): as regras para quem altera o repositório.
 
 ## 🤝 Contribuir e comunidade
 

@@ -46,7 +46,7 @@
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
 | 仓库检查 | 🟡 | 仓库检查、图片检查以及基础部分的 3 个测试都在 CI 中运行并通过。 |
-| 测试 | 🟡 | Rust 代码的 21 个测试和基础部分的 3 个测试在计算机上通过。它们只使用测试自己生成的数据。 |
+| 测试 | 🟡 | Rust 代码的 30 个测试和基础部分的 3 个测试在计算机上通过。它们只使用测试自己生成的数据。 |
 | 真实硬件 | 🟠 | 没有在任何机床或电路板上运行过：这里没有任何内容在硬件上试过。 |
 | 计划的功能 | 🟠 | 已编写：每个名称都带单位的配置文件、刀具表、带来源的供应商限制、引用配置文件的哈希以及违规说明。未编写：与服务器和刀具管理器的机床文件的对应。 |
 | 需求 | 🟠 | 6 项需求中有 5 项处于原型阶段；与机床文件的对应（MPRO-002）仅在计划中。没有一项已验证。 |
@@ -99,13 +99,14 @@ python -I -m unittest discover -s tools -p "test_*.py"
 EH3D-MANUFACTURING-PROFILE/
 ├── docs/
 │   ├── architecture.json structure.json         两张图的数据
-│   ├── SCOPE.md REQUIREMENTS.md                 计划内容及其需求
+│   ├── SCOPE.md REQUIREMENTS.md                 范围，以及带有各项测试的需求登记表
 │   ├── DEPENDENCIES.md THREAT_MODEL.md          与其他仓库的关系和威胁模型
 │   ├── DECISIONS.md STATUS.md                   适用的决策和如实的状态
 │   ├── NOT_YET.md RULES.md                      留待以后的想法和编写代码的规则
 │   └── adr/                                     已接受的决策记录
 ├── AGENTS.md                                    修改仓库的人需遵守的规则
 ├── src/                                         库和命令行
+├── tests/                                       保持需求登记表真实的测试
 ├── Cargo.toml Cargo.lock deny.toml              Rust 包与依赖策略
 ├── rust-toolchain.toml                          固定的 Rust 工具链
 ├── tools/                                       仓库检查、其测试以及图片工具
@@ -143,7 +144,11 @@ README 和文本提供英语、西班牙语、法语、意大利语、德语、�
 
 * [套件的约定](https://github.com/JuanenRac/EH3D-DOCS/blob/main/docs/CONVENTIONS.md)
 * [变更日志](CHANGELOG.md)
-* [范围、需求、依赖、威胁模型和决策](docs/SCOPE.md)
+* [范围](docs/SCOPE.md)： 程序的用途、不做什么，以及永远不由它决定的事。
+* [需求](docs/REQUIREMENTS.md)： 功能登记表、每项的状态以及证明它的测试。
+* [状态](docs/STATUS.md)： 已有的、缺少的和仍未决定的。
+* [暂不包含](docs/NOT_YET.md)： 本版本暂不包含的好想法。
+* [修改仓库的规则](AGENTS.md)： 修改本仓库的人需要遵守的规则。
 
 ## 🤝 参与贡献与社区
 
