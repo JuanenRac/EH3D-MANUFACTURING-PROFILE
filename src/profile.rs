@@ -598,4 +598,193 @@ mod tests {
             Err(MproError::TooLarge { .. })
         ));
     }
+
+    #[test]
+    fn a_text_that_is_not_a_profile_is_an_error_and_never_a_panic() {
+        let config = Config::default();
+        for text in [
+            "",
+            " ",
+            "null",
+            "[]",
+            "{",
+            r#"{"name":1,"kind":"machine"}"#,
+            r#"{"name":"m","kind":"robot"}"#,
+            r#"{"name":"m"}"#,
+            "\u{feff}{\"name\":\"m\",\"kind\":\"machine\"}",
+        ] {
+            assert!(
+                matches!(
+                    Profile::from_json(text, &config),
+                    Err(MproError::BadJson(_))
+                ),
+                "{text:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_field_the_format_does_not_know_is_refused_in_every_part_of_the_profile() {
+        let config = Config::default();
+        for text in [
+            r#"{"name":"m","kind":"machine","speed":3}"#,
+            r#"{"name":"m","kind":"machine","tools":[{"number":1,"diameter_mm":1.0,"length":5}]}"#,
+            r#"{"name":"m","kind":"machine","limits":{"max_speed_rpm":{"value":1.0,"unit":"rpm"}}}"#,
+        ] {
+            assert!(
+                matches!(
+                    Profile::from_json(text, &config),
+                    Err(MproError::BadJson(_))
+                ),
+                "{text}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_hash_does_not_depend_on_the_order_of_the_keys_of_the_file() {
+        let config = Config::default();
+        let a = Profile::from_json(
+            r#"{"name":"m","kind":"machine","source":"manual"}"#,
+            &config,
+        )
+        .unwrap();
+        let b = Profile::from_json(
+            r#"{"source":"manual","kind":"machine","name":"m"}"#,
+            &config,
+        )
+        .unwrap();
+        assert_eq!(a.hash(), b.hash());
+    }
+
+    #[test]
+    fn the_hash_is_sixty_four_lower_case_hexadecimal_digits() {
+        let hash = supplier().hash();
+        assert_eq!(hash.len(), 64);
+        assert!(hash
+            .chars()
+            .all(|c| c.is_ascii_digit() || ('a'..='f').contains(&c)));
+    }
+
+    #[test]
+    fn a_profile_written_and_read_again_is_the_same_profile_with_the_same_hash() {
+        let config = Config::default();
+        let original = supplier();
+        let text = serde_json::to_string(&original).unwrap();
+        let again = Profile::from_json(&text, &config).unwrap();
+        assert_eq!(again, original);
+        assert_eq!(again.hash(), original.hash());
+        let pretty = serde_json::to_string_pretty(&original).unwrap();
+        assert_eq!(
+            Profile::from_json(&pretty, &config).unwrap().hash(),
+            original.hash()
+        );
+    }
+
+    #[test]
+    fn a_change_of_one_value_of_a_limit_changes_the_hash() {
+        let mut p = supplier();
+        let before = p.hash();
+        p.limits.get_mut("min_track_mm").unwrap().value = 0.16;
+        assert_ne!(p.hash(), before);
+    }
+
+    #[test]
+    fn a_measurement_exactly_on_a_limit_passes() {
+        let p = supplier();
+        let mut m = BTreeMap::new();
+        m.insert("track_mm".to_string(), 0.15);
+        m.insert("layers_count".to_string(), 4.0);
+        assert!(p.verify(&m, &Config::default()).unwrap().is_empty());
+    }
+
+    #[test]
+    fn the_violations_come_sorted_by_the_name_of_the_limit() {
+        let p = supplier();
+        let mut m = BTreeMap::new();
+        m.insert("track_mm".to_string(), 0.1);
+        m.insert("layers_count".to_string(), 6.0);
+        let v = p.verify(&m, &Config::default()).unwrap();
+        let names: Vec<&str> = v.iter().map(|x| x.limit.as_str()).collect();
+        assert_eq!(names, ["max_layers_count", "min_track_mm"]);
+    }
+
+    #[test]
+    fn a_limit_without_a_source_takes_the_source_of_the_profile() {
+        let mut p = supplier();
+        p.limits
+            .insert("min_track_mm".to_string(), limit(0.15, "", ""));
+        let mut m = BTreeMap::new();
+        m.insert("track_mm".to_string(), 0.1);
+        let v = p.verify(&m, &Config::default()).unwrap();
+        assert_eq!(v.len(), 1);
+        assert_eq!(v[0].source, "price list");
+        assert_eq!(v[0].remedy, "");
+    }
+
+    #[test]
+    fn the_sentence_of_a_violation_leaves_out_the_source_and_the_remedy_when_they_are_empty() {
+        let v = Violation {
+            limit: "min_track_mm".into(),
+            quantity: "track_mm".into(),
+            measured: 0.1,
+            bound: 0.15,
+            source: String::new(),
+            remedy: String::new(),
+        };
+        assert_eq!(
+            v.explanation(),
+            "track_mm is 0.1, below the minimum 0.15 (min_track_mm)"
+        );
+    }
+
+    #[test]
+    fn a_limit_that_is_neither_a_minimum_nor_a_maximum_is_never_compared_nor_listed() {
+        let mut p = supplier();
+        p.limits.insert("weird".to_string(), limit(1.0, "x", "y"));
+        let mut m = BTreeMap::new();
+        m.insert("track_mm".to_string(), 0.1);
+        m.insert("layers_count".to_string(), 2.0);
+        assert!(p.unmeasured(&m).is_empty());
+        let v = p.verify(&m, &Config::default()).unwrap();
+        assert!(v.iter().all(|x| x.limit != "weird"));
+    }
+
+    #[test]
+    fn the_limits_that_no_measurement_answers_come_sorted() {
+        let p = supplier();
+        let m = BTreeMap::new();
+        assert_eq!(p.unmeasured(&m), ["max_layers_count", "min_track_mm"]);
+    }
+
+    #[test]
+    fn a_very_large_set_of_measurements_is_compared_without_a_panic() {
+        let p = supplier();
+        let mut m = BTreeMap::new();
+        for n in 0..20_000 {
+            m.insert(format!("quantity_{n}_mm"), f64::from(n));
+        }
+        m.insert("track_mm".to_string(), 0.1);
+        let v = p.verify(&m, &Config::default()).unwrap();
+        assert_eq!(v.len(), 1);
+    }
+
+    #[test]
+    fn a_profile_with_exactly_the_most_entries_is_read_and_one_more_is_not() {
+        let config = Config {
+            max_entries: 2,
+            ..Config::default()
+        };
+        let mut p = supplier();
+        assert_eq!(p.limits.len(), 2);
+        let text = serde_json::to_string(&p).unwrap();
+        assert!(Profile::from_json(&text, &config).is_ok());
+        p.limits
+            .insert("max_speed_rpm".to_string(), limit(9000.0, "manual", ""));
+        let text = serde_json::to_string(&p).unwrap();
+        assert!(matches!(
+            Profile::from_json(&text, &config),
+            Err(MproError::TooLarge { .. })
+        ));
+    }
 }

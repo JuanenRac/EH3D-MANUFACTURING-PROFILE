@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-Markdown%20%2B%20Python-blue.svg" alt="Markdown and Python">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Tests-3-2EA043.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-68-2EA043.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Version-0.0.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-scaffolding-FFB020.svg" alt="Maturity">
 </p>
@@ -31,7 +31,7 @@
 |---|---|
 | Version | `0.0.4` |
 | Maturité | Échafaudage |
-| Tests | 3 |
+| Tests | 68 |
 | Pile technique | Markdown, Python 3.10+ |
 | Sur du matériel réel | Pas encore exécuté sur du matériel |
 
@@ -45,8 +45,8 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
-| Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 3 tests de la base tournent dans la CI et réussissent. |
-| Tests | 🟡 | Les 30 tests du code Rust et les 3 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
+| Contrôles du dépôt | 🟡 | Le contrôle du dépôt, celui des images et les 68 tests de la base tournent dans la CI et réussissent. |
+| Tests | 🟡 | Les 50 tests du code Rust et les 68 de la base réussissent sur un ordinateur. Ils n'utilisent que des données faites par les tests eux-mêmes. |
 | Matériel réel | 🟠 | Non exécuté sur une machine ni une carte : rien ici n'a été essayé sur du matériel. |
 | Fonction prévue | 🟠 | Écrit : le profil avec des unités dans chaque nom, la table d'outils, les restrictions de fournisseur avec leur source, le hash qui cite un profil et l'explication d'une violation. Non écrit : la correspondance avec les fichiers de machine du serveur et du gestionnaire d'outils. |
 | Exigences | 🟠 | 5 des 6 exigences sont au stade de prototype ; la correspondance avec les fichiers de machine (MPRO-002) est seulement prévue. Aucune n'est validée. |
@@ -80,7 +80,7 @@ python -I -m unittest discover -s tools -p "test_*.py"
 
 ## 🧪 Tests
 
-La base a 3 tests (`python -I -m unittest discover -s tools -p "test_*.py"`), et ils réussissent. La CI exécute le contrôle du dépôt, celui des images et ces tests.
+La base a 68 tests (`python -I -m unittest discover -s tools -p "test_*.py"`), et ils réussissent. La CI exécute le contrôle du dépôt, celui des images et ces tests.
 
 ## 🏗️ Compilation et publication
 

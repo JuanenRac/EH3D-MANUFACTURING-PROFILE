@@ -191,4 +191,71 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn comments_and_blank_lines_change_nothing() {
+        let c = Config::parse("# a comment\n\n   \n  # another\n").unwrap();
+        assert_eq!(c, Config::default());
+    }
+
+    #[test]
+    fn the_three_spellings_of_a_switch_are_read_each_way() {
+        for on in ["true", "on", "yes"] {
+            let c = Config::parse(&format!("require_source = {on}\n")).unwrap();
+            assert!(c.require_source, "{on}");
+        }
+        for off in ["false", "off", "no"] {
+            let c = Config::parse(&format!("require_source = {off}\n")).unwrap();
+            assert!(!c.require_source, "{off}");
+        }
+        assert!(Config::parse("require_source = ON\n").is_err());
+    }
+
+    #[test]
+    fn the_line_of_the_error_is_the_line_of_the_file() {
+        assert!(matches!(
+            Config::parse("# one\n\nrequire_source = on\nmax_entries = x\n"),
+            Err(MproError::ConfigBadValue { line: 4, .. })
+        ));
+        assert!(matches!(
+            Config::parse("require_source = on\n\nbroken\n"),
+            Err(MproError::ConfigSyntax { line: 3 })
+        ));
+    }
+
+    #[test]
+    fn spaces_around_the_key_and_the_value_are_ignored_and_the_units_are_lower_cased() {
+        let c = Config::parse("  units   =   MM ,  Rpm  \n").unwrap();
+        assert_eq!(c.units, vec!["mm", "rpm"]);
+    }
+
+    #[test]
+    fn the_tolerance_is_accepted_from_zero_to_fifty_and_not_beyond() {
+        assert_eq!(
+            Config::parse("tolerance_percent = 0\n")
+                .unwrap()
+                .tolerance_percent,
+            0.0
+        );
+        assert_eq!(
+            Config::parse("tolerance_percent = 50\n")
+                .unwrap()
+                .tolerance_percent,
+            50.0
+        );
+        for bad in ["-0.1", "50.1", "inf", "abc"] {
+            assert!(
+                Config::parse(&format!("tolerance_percent = {bad}\n")).is_err(),
+                "{bad}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_value_with_an_equals_sign_inside_is_not_a_unit() {
+        assert!(matches!(
+            Config::parse("units = mm=um\n"),
+            Err(MproError::ConfigBadValue { line: 1, .. })
+        ));
+    }
 }
