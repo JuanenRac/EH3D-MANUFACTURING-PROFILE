@@ -46,7 +46,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Controlli del repository | 🟡 | Il controllo del repository, quello delle immagini e i 68 test della base girano nella CI e passano. |
-| Test | 🟡 | I 50 test del codice Rust e i 68 della base passano su un computer. Usano solo dati prodotti dai test stessi. |
+| Test | 🟡 | I 61 test del codice Rust e i 68 della base passano su un computer. Usano solo dati prodotti dai test stessi. |
 | Hardware reale | 🟠 | Non eseguito su nessuna macchina né scheda: nulla qui è stato provato su hardware. |
 | Funzione pianificata | 🟠 | Scritto: il profilo con unità in ogni nome, la tabella utensili, le restrizioni del fornitore con la loro fonte, l'hash che cita un profilo e la spiegazione di una violazione. Non scritto: la corrispondenza con i file macchina del server e del gestore utensili. |
 | Requisiti | 🟠 | 5 dei 6 requisiti sono a livello di prototipo; la corrispondenza con i file macchina (MPRO-002) è solo pianificata. Nessuno è validato. |

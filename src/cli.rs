@@ -5,8 +5,7 @@
 
 use crate::config::Config;
 use crate::error::MproError;
-use crate::profile::Profile;
-use std::collections::BTreeMap;
+use crate::profile::{measurements_from_json, Profile};
 use std::fs;
 use std::io::Write;
 use std::path::Path;
@@ -104,8 +103,7 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<MproErro
                 }
             }
             let text = read_text(Path::new(&args[2]), config.max_file_bytes).map_err(Some)?;
-            let measurements: BTreeMap<String, f64> =
-                serde_json::from_str(&text).map_err(|e| Some(MproError::BadJson(e.to_string())))?;
+            let measurements = measurements_from_json(&text).map_err(Some)?;
             let violations = profile.verify(&measurements, &config).map_err(Some)?;
             for v in &violations {
                 let _ = writeln!(
@@ -282,5 +280,18 @@ mod tests {
         ]);
         assert_eq!(code, 2);
         assert!(err.contains("weight_count"), "{err}");
+    }
+
+    #[test]
+    fn a_measurement_written_twice_ends_with_2_and_names_it() {
+        let work = tempfile::tempdir().unwrap();
+        let good = work.path().join("good.json");
+        let twice = work.path().join("twice.json");
+        fs::write(&good, GOOD).unwrap();
+        fs::write(&twice, r#"{"track_mm":0.1,"track_mm":0.2}"#).unwrap();
+        let (code, out, err) = call(&["verify", good.to_str().unwrap(), twice.to_str().unwrap()]);
+        assert_eq!(code, 2, "{out}");
+        assert!(err.contains("track_mm"), "{err}");
+        assert!(!out.contains("violations"), "{out}");
     }
 }
