@@ -3,6 +3,9 @@
 All notable changes to this project are documented here.
 
 ## [Unreleased]
+
+## [0.0.5] - Duplicated limits and measurements are refused, and many more tests
+
 - **A limit or a measurement written twice is refused:** the last one took the place of the first in silence, so a looser bound or another measurement was compared and could pass. The profile and the measurements file now say which key is repeated.
 - **A JSON array is no longer read as a profile:** only an object is.
 - **11 more tests** of the Rust code: a profile cut at every place, bad measurement files, the units, the tolerance on both sides and a seeded campaign against the plain comparison of every bound.
