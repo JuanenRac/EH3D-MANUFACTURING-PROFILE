@@ -60,8 +60,50 @@ pub struct Profile {
     #[serde(default)]
     pub tools: Vec<Tool>,
     /// The limits, named `min_<quantity>` or `max_<quantity>` where the quantity ends in a unit.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "unique_map")]
     pub limits: BTreeMap<String, Limit>,
+}
+
+/// A JSON object read as a map that refuses a key written twice: without this the last one would silently take the place of the others.
+fn unique_map<'de, D, V>(deserializer: D) -> Result<BTreeMap<String, V>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+    V: Deserialize<'de>,
+{
+    struct Unique<V>(std::marker::PhantomData<V>);
+    impl<'de, V: Deserialize<'de>> serde::de::Visitor<'de> for Unique<V> {
+        type Value = BTreeMap<String, V>;
+
+        fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("an object")
+        }
+
+        fn visit_map<A: serde::de::MapAccess<'de>>(
+            self,
+            mut map: A,
+        ) -> Result<Self::Value, A::Error> {
+            let mut out = BTreeMap::new();
+            while let Some((key, value)) = map.next_entry::<String, V>()? {
+                if out.contains_key(&key) {
+                    return Err(serde::de::Error::custom(format!(
+                        "the key `{key}` is written twice"
+                    )));
+                }
+                out.insert(key, value);
+            }
+            Ok(out)
+        }
+    }
+    deserializer.deserialize_map(Unique(std::marker::PhantomData))
+}
+
+/// Read the measurements of a design: a JSON object of quantity to number. A quantity written twice is an error, because only one of the two would be compared.
+pub fn measurements_from_json(text: &str) -> Result<BTreeMap<String, f64>, MproError> {
+    let bad = |e: serde_json::Error| MproError::BadJson(e.to_string());
+    let mut reader = serde_json::Deserializer::from_str(text);
+    let measurements = unique_map(&mut reader).map_err(bad)?;
+    reader.end().map_err(bad)?;
+    Ok(measurements)
 }
 
 /// Something wrong in a profile.
@@ -138,6 +180,10 @@ impl Profile {
             return Err(MproError::TooLarge {
                 what: "profile bytes",
             });
+        }
+        // a JSON array would be read as a list of the fields in order, so only an object is a profile
+        if !text.trim_start().starts_with('{') {
+            return Err(MproError::BadJson("a JSON object was expected".into()));
         }
         let profile: Profile =
             serde_json::from_str(text).map_err(|e| MproError::BadJson(e.to_string()))?;
@@ -786,5 +832,170 @@ mod tests {
             Profile::from_json(&text, &config),
             Err(MproError::TooLarge { .. })
         ));
+    }
+
+    #[test]
+    fn a_limit_written_twice_is_refused_and_the_looser_one_never_wins_in_silence() {
+        let text = r#"{"name":"m","kind":"machine","limits":{"min_track_mm":{"value":0.2},"min_track_mm":{"value":0.05}}}"#;
+        match Profile::from_json(text, &Config::default()) {
+            Err(MproError::BadJson(message)) => {
+                assert!(message.contains("min_track_mm"), "{message}")
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_measurement_written_twice_is_refused() {
+        assert!(matches!(
+            measurements_from_json(r#"{"track_mm":0.01,"track_mm":9}"#),
+            Err(MproError::BadJson(_))
+        ));
+        let read = measurements_from_json(r#"{"track_mm":0.2,"layers_count":2}"#).unwrap();
+        assert_eq!(read.len(), 2);
+        assert_eq!(read["layers_count"], 2.0);
+    }
+
+    #[test]
+    fn measurements_that_are_not_an_object_of_numbers_are_an_error() {
+        for text in [
+            "",
+            "[]",
+            "null",
+            "12",
+            "{",
+            r#"{"a_mm":"1"}"#,
+            r#"{"a_mm":null}"#,
+            r#"{"a_mm":1e999}"#,
+            r#"{"a_mm":1} {"b_mm":2}"#,
+        ] {
+            assert!(
+                matches!(measurements_from_json(text), Err(MproError::BadJson(_))),
+                "{text:?}"
+            );
+        }
+        assert!(measurements_from_json("{}").unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_json_array_is_not_a_profile() {
+        for text in [r#"["m","machine"]"#, r#" ["m","machine","",[],{}]"#] {
+            assert!(
+                matches!(
+                    Profile::from_json(text, &Config::default()),
+                    Err(MproError::BadJson(_))
+                ),
+                "{text}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_profile_cut_at_any_place_is_an_error_and_never_a_panic() {
+        let text = serde_json::to_string(&supplier()).unwrap();
+        for end in (0..text.len()).filter(|i| text.is_char_boundary(*i)) {
+            assert!(
+                matches!(
+                    Profile::from_json(&text[..end], &Config::default()),
+                    Err(MproError::BadJson(_))
+                ),
+                "cut at {end}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_unit_needs_a_quantity_before_it() {
+        for quantity in ["mm", "_mm", "track", "trackmm", "track_cm", "track_mm_"] {
+            assert!(!has_unit(quantity, &Config::default()), "{quantity}");
+        }
+        for quantity in ["t_mm", "feed_mm_min", "speed_rpm", "angle_deg", "temp_c"] {
+            assert!(has_unit(quantity, &Config::default()), "{quantity}");
+        }
+    }
+
+    #[test]
+    fn the_tolerance_widens_a_maximum_and_a_negative_bound_in_the_right_direction() {
+        let mut p = supplier();
+        p.limits.clear();
+        p.limits
+            .insert("max_speed_rpm".into(), limit(1000.0, "manual", ""));
+        p.limits
+            .insert("min_temp_c".into(), limit(-20.0, "manual", ""));
+        let loose = Config {
+            tolerance_percent: 5.0,
+            ..Config::default()
+        };
+        let measured = |speed: f64, temp: f64| {
+            BTreeMap::from([
+                ("speed_rpm".to_string(), speed),
+                ("temp_c".to_string(), temp),
+            ])
+        };
+        assert!(p
+            .verify(&measured(1050.0, -21.0), &loose)
+            .unwrap()
+            .is_empty());
+        assert_eq!(p.verify(&measured(1050.1, -21.1), &loose).unwrap().len(), 2);
+    }
+
+    #[test]
+    fn a_seeded_campaign_agrees_with_the_plain_comparison_of_every_bound() {
+        let mut state = 7u64;
+        let mut next = || {
+            state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            f64::from((state >> 33) as u32 % 41) - 20.0
+        };
+        for round in 0..300 {
+            let (low, high, value) = (next(), next(), next());
+            let mut p = supplier();
+            p.limits.clear();
+            p.limits.insert("min_x_mm".into(), limit(low, "s", ""));
+            p.limits.insert("max_x_mm".into(), limit(high, "s", ""));
+            let found = p
+                .verify(
+                    &BTreeMap::from([("x_mm".to_string(), value)]),
+                    &Config::default(),
+                )
+                .unwrap();
+            let names: Vec<&str> = found.iter().map(|v| v.limit.as_str()).collect();
+            assert_eq!(names.contains(&"min_x_mm"), value < low, "round {round}");
+            assert_eq!(names.contains(&"max_x_mm"), value > high, "round {round}");
+            let impossible = p
+                .check(&Config::default())
+                .iter()
+                .any(|f| f.code == Code::BadLimit);
+            assert_eq!(impossible, low > high, "round {round}");
+        }
+    }
+
+    #[test]
+    fn a_tool_with_a_diameter_that_is_negative_or_not_finite_is_a_bad_limit() {
+        for bad in [-1.0, 0.0, f64::NAN, f64::INFINITY] {
+            let mut p = supplier();
+            p.tools[0].diameter_mm = bad;
+            let found = p.check(&Config::default());
+            assert_eq!(found.len(), 1, "{bad}");
+            assert_eq!(found[0].code, Code::BadLimit);
+            assert_eq!(found[0].subject, "tool 1");
+        }
+    }
+
+    #[test]
+    fn a_change_of_a_tool_of_the_kind_or_of_the_source_changes_the_hash() {
+        let base = supplier().hash();
+        let mut tool = supplier();
+        tool.tools[1].diameter_mm = 1.2;
+        let mut kind = supplier();
+        kind.kind = Kind::Machine;
+        let mut source = supplier();
+        source.source = "manual".into();
+        let mut order = supplier();
+        order.tools.reverse();
+        for p in [tool, kind, source, order] {
+            assert_ne!(p.hash(), base);
+        }
     }
 }
