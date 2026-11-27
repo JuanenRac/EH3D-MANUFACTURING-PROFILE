@@ -46,7 +46,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Repository checks | 🟡 | The repository check, the check of the pictures and the 68 tests of the base run in CI and pass. |
-| Tests | 🟡 | 62 tests of the Rust code and the 68 of the base pass on a computer. They use only data made by the tests themselves. |
+| Tests | 🟡 | 63 tests of the Rust code and the 68 of the base pass on a computer. They use only data made by the tests themselves. |
 | Real hardware | 🟠 | Not run on any machine or board: nothing here has been tried on hardware. |
 | Planned function | 🟠 | Written: the profile with units in every name, the tool table, supplier restrictions with their source, the hash that cites a profile and the explanation of a violation. Not written: the mapping of the machine files of the server and of the tool manager. |
 | Requirements | 🟠 | 5 of the 6 requirements are at prototype; the mapping of the machine files (MPRO-002) is only planned. None is validated. |

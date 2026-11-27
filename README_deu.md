@@ -46,7 +46,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Repository-Prüfungen | 🟡 | Die Repository-Prüfung, die Prüfung der Bilder und die 68 Tests der Basis laufen in der CI und bestehen. |
-| Tests | 🟡 | Die 62 Tests des Rust-Codes und die 68 der Basis bestehen auf einem Rechner. Sie verwenden nur Daten, die die Tests selbst erzeugen. |
+| Tests | 🟡 | Die 63 Tests des Rust-Codes und die 68 der Basis bestehen auf einem Rechner. Sie verwenden nur Daten, die die Tests selbst erzeugen. |
 | Echte Hardware | 🟠 | Auf keiner Maschine und keiner Platine ausgeführt: nichts hier wurde auf Hardware ausprobiert. |
 | Geplante Funktion | 🟠 | Geschrieben: das Profil mit Einheiten in jedem Namen, die Werkzeugtabelle, Lieferanten-Einschränkungen mit Quelle, der Hash, der ein Profil zitiert, und die Erklärung einer Verletzung. Nicht geschrieben: die Zuordnung der Maschinendateien von Server und Werkzeugverwaltung. |
 | Anforderungen | 🟠 | 5 der 6 Anforderungen sind im Prototyp; die Zuordnung der Maschinendateien (MPRO-002) ist nur geplant. Keine ist validiert. |
