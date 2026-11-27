@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 - **`verify` fails when it compares nothing:** with a profile without limits, or with no measurement that answers one, it said "0 violations" and exit code 0. It now says that nothing was compared and exits with 1. A partly measured profile behaves as before.
 - **1 more test** of the Rust code, for the above.
+- **A name read from a file can no longer forge a line of the output:** line breaks and control characters in the findings, the violations, the limits not evaluated and the error messages are printed as spaces. What is compared, hashed and the exit codes do not change.
+- **1 more test** of the Rust code, for the above.
 
 ## [0.0.5] - Duplicated limits and measurements are refused, and many more tests
 
