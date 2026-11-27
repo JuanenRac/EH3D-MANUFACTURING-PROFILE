@@ -123,8 +123,17 @@ fn dispatch(args: &[String], out: &mut dyn Write) -> Result<i32, Option<MproErro
                     unmeasured.join(", ")
                 );
             }
+            let compared = profile.limits.keys().any(|name| {
+                (name.starts_with("min_") || name.starts_with("max_")) && !unmeasured.contains(name)
+            });
+            if !compared {
+                let _ = writeln!(
+                    out,
+                    "# nothing was compared: no limit of the profile has a measurement"
+                );
+            }
             let missing = config.require_all_limits_measured && !unmeasured.is_empty();
-            Ok(if violations.is_empty() && !missing {
+            Ok(if compared && violations.is_empty() && !missing {
                 0
             } else {
                 1
@@ -221,7 +230,8 @@ mod tests {
         fs::write(&empty, "{}").unwrap();
         fs::write(&cfg, "require_all_limits_measured = on\n").unwrap();
         let (code, text, _) = call(&["verify", good.to_str().unwrap(), empty.to_str().unwrap()]);
-        assert_eq!(code, 0);
+        assert_eq!(code, 1);
+        assert!(text.contains("# nothing was compared"), "{text}");
         assert!(
             text.contains("# 0 violations") && text.contains("limits not evaluated"),
             "{text}"
@@ -293,5 +303,17 @@ mod tests {
         assert_eq!(code, 2, "{out}");
         assert!(err.contains("track_mm"), "{err}");
         assert!(!out.contains("violations"), "{out}");
+    }
+
+    #[test]
+    fn a_verification_that_compares_no_limit_does_not_succeed() {
+        let work = tempfile::tempdir().unwrap();
+        let none = work.path().join("none.json");
+        let other = work.path().join("other.json");
+        std::fs::write(&none, r#"{"name":"m","kind":"machine"}"#).unwrap();
+        std::fs::write(&other, r#"{"height_mm":3}"#).unwrap();
+        let (code, text, _) = call(&["verify", none.to_str().unwrap(), other.to_str().unwrap()]);
+        assert_eq!(code, 1, "{text}");
+        assert!(text.contains("# nothing was compared"), "{text}");
     }
 }

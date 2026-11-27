@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **`verify` fails when it compares nothing:** with a profile without limits, or with no measurement that answers one, it said "0 violations" and exit code 0. It now says that nothing was compared and exits with 1. A partly measured profile behaves as before.
+- **1 more test** of the Rust code, for the above.
+
 ## [0.0.5] - Duplicated limits and measurements are refused, and many more tests
 
 - **A limit or a measurement written twice is refused:** the last one took the place of the first in silence, so a looser bound or another measurement was compared and could pass. The profile and the measurements file now say which key is repeated.

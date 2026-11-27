@@ -46,7 +46,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Comprobaciones del repositorio | 🟡 | La comprobación del repositorio, la de las imágenes y las 68 pruebas de la base se ejecutan en el CI y pasan. |
-| Pruebas | 🟡 | Las 61 pruebas del código Rust y las 68 de la base pasan en un ordenador. Usan solo datos hechos por las propias pruebas. |
+| Pruebas | 🟡 | Las 62 pruebas del código Rust y las 68 de la base pasan en un ordenador. Usan solo datos hechos por las propias pruebas. |
 | Hardware real | 🟠 | No se ha ejecutado en ninguna máquina ni placa: nada de aquí se ha probado en hardware. |
 | Función planificada | 🟠 | Escrito: el perfil con unidades en cada nombre, la tabla de herramientas, las restricciones de proveedor con su fuente, el hash que cita un perfil y la explicación de una infracción. Sin escribir: la correspondencia con los ficheros de máquina del servidor y del gestor de herramientas. |
 | Requisitos | 🟠 | 5 de los 6 requisitos están en prototipo; la correspondencia con los ficheros de máquina (MPRO-002) solo está planificada. Ninguno está validado. |
